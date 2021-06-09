@@ -36,25 +36,57 @@ void move_prefix_table(vector<int>& prefix)
     prefix[0] = -1;
 }
 
-void print_array(vector<int>& arr) {
+void print_array(vector<int>& arr)
+{
     for (int a : arr) {
         cout << a;
     }
     cout << endl;
+}
 
+
+void kmp_search(string text, string pattern)
+{
+    int m = text.size();
+    int n = pattern.size();
+    int i = 0, j = 0;
+    vector<int> prefix(n);
+    prefix_table(pattern, prefix);
+    move_prefix_table(prefix);
+
+    while (i < m) {
+        if (j == n - 1 && text[i] == pattern[j]) {
+            cout << "Found match pattern in text [ " << i - j << " ]"<<endl;
+            j = prefix[j]; //继续匹配
+        }
+        if (text[i] == pattern[j]) {
+            i++;
+            j++;
+        } else {
+            //不匹配时，可以看跟构造prefix table 时，是一样的思路
+            //只不过j右移了，所以不需要减一
+            j = prefix[j];
+            if (j == -1) { //如果没有匹配那么右移
+                i++;
+                j++;
+            }
+        }
+    }
 }
 
 
 int main()
 {
-    string text = "AACABABCABAACABDC";
+    string text = "AACABABCABAACABDCABABCABAA";
     string pattern = "ABABCABAA";
-    vector<int> prefix(pattern.size());
-    prefix_table(pattern, prefix);
-    cout << "Prefix table: " << endl;
-    print_array(prefix);
-    move_prefix_table(prefix);
-    cout << "Prefix table After move:" << endl;
-    print_array(prefix);
+
+    kmp_search(text, pattern);
+    // vector<int> prefix(pattern.size());
+    // prefix_table(pattern, prefix);
+    // cout << "Prefix table: " << endl;
+    // print_array(prefix);
+    // move_prefix_table(prefix);
+    // cout << "Prefix table After move:" << endl;
+    // print_array(prefix);
     return 0;
 }
