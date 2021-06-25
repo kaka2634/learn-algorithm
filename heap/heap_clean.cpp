@@ -29,7 +29,8 @@ private:
         int val = arr[idx];
         //更新：通过son函数找到更大的儿子，parent直接与最大儿子比较
         int son_idx = son(idx);
-        while (son_idx <= max_idx && arr[idx] < arr[son_idx]) {
+        //注意： 这里用val 而不是用arr[idx]去和arr[son_idx]比较_
+        while (son_idx <= max_idx && val < arr[son_idx]) {
             arr[idx] = arr[son_idx];
             idx = son_idx;
             son_idx = son(idx);

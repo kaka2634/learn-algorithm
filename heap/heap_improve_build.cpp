@@ -28,7 +28,7 @@ private:
     {
         int val = arr[idx];
         int son_idx = son(idx);
-        while (son_idx <= max_idx && arr[idx] < arr[son_idx]) {
+        while (son_idx <= max_idx && val < arr[son_idx]) {
             arr[idx] = arr[son_idx];
             idx = son_idx;
             son_idx = son(idx);
@@ -62,6 +62,7 @@ public:
     // 更新： 修改build heap的方式
     // 使用下沉的方式能够达到 O(n) 的复杂度
     // 而每次插入元素，上浮的方式的复杂度是 O(nlogn)
+    // 这两种方式生成出来的heap并不相同
     void build(int nums[], int n)
     {
         max_idx = n;
@@ -69,11 +70,14 @@ public:
         for (int i = 0; i < n; i++) {
             arr[i + 1] = nums[i];
         }
+       
         //从n/2的元素开始，向堆顶遍历，逐个下沉到合适位置
-        for (int i = n / 2 ; i > 0; --i) {
+        for (int i = max_idx / 2 ; i > 0; --i) {
             sink(i);
+            // print();
         }
     }
+
 
     void print()
     {
