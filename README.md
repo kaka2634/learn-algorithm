@@ -10,7 +10,8 @@
 - [x] [线段树 segment_tree](segment_tree) 
 - [x] [字典树 trie_tree](trie_tree) 
 - [x] [动态数组 vector](vector)
-- [x] [二叉堆 heap](heap)  
+- [x] [二叉堆 heap](heap)
+- [ ] [二叉搜索树 binary_search_tree](binary_search_tree)    
 
 
 #### 算法
