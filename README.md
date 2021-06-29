@@ -12,7 +12,7 @@
 - [x] [动态数组 vector](vector)
 - [x] [二叉堆 heap](heap)
 - [ ] [二叉搜索树 binary_search_tree](binary_search_tree)    
-
+- [ ] [自平衡二叉搜索树 avl_tree](avl_tree) 
 
 #### 算法
 - [x] [图的算法](graph)
