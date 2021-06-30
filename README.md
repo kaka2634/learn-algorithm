@@ -11,8 +11,8 @@
 - [x] [字典树 trie_tree](trie_tree) 
 - [x] [动态数组 vector](vector)
 - [x] [二叉堆 heap](heap)
-- [ ] [二叉搜索树 binary_search_tree](binary_search_tree)    
-- [ ] [自平衡二叉搜索树 avl_tree](avl_tree) 
+- [x] [二叉搜索树 binary_search_tree](binary_search_tree)    
+- [ ] [平衡二叉搜索树 avl_tree](avl_tree) 
 
 #### 算法
 - [x] [图的算法](graph)
@@ -21,3 +21,4 @@
 ### 学习总结
 - [x] [动态数组 vector](vector)
 - [x] [二叉堆 heap](heap)  
+- [ ] [平衡二叉搜索树 avl_tree](avl_tree) 
