@@ -1,70 +1,6 @@
-//平衡二叉搜索树(AVL tree，Adelson-Velsky and Landis Tree, 简称平衡二叉树)
-//性质：每个节点的左子树和右子树的高度差至多为1
-//时间复杂度等同二叉搜索树，且稳定为O(logn)
-//参考： https://juejin.cn/post/6844904006033080333
-
-//节点结构
-class Node {
-public:
-    int val;
-    Node* left;
-    Node* right;
-    Node(int x)
-        : val(x)
-        , left(nullptr)
-        , right(nullptr)
-    {
-    }
-};
-
-//
-
-class AVLTree {
-
-public:
-    int get_height(Node* p);
-    Node* find(int x);
-    Node* insert(int x);
-    Node* remove(int x);
-
-private:
-    Node* root;
-
-    /*********************
-**    四种旋转方式   **
-**********************/
-
-    //LL平衡旋转 (向右单旋转)：在左孩子(L)的左子树(L)插入导致的不平衡
-    Node* LL_rotate(Node* root);
-
-    //RR平衡旋转 (向左单旋转)：在右孩子(R)的右子树(R)插入导致的不平衡
-    Node* RR_rotate(Node* root);
-
-    //RL平衡旋转 (先向右后向左双旋转)：在右孩子(R)的左子树(L)插入导致的不平衡
-    Node* RL_rotate(Node* root);
-
-    //LR平衡旋转 (先向左后向右双旋转)：在左孩子(L)的右子树(R)插入导致的不平衡
-    Node* LR_rotate(Node* root);
-
-    //获取节点的平衡因子
-    int get_balance_factor(Node* p);
-
-    //平衡节点 (平衡二叉树的关键)
-    Node* balance(Node* root);
-
-    //递归插入
-    Node* insert(Node* root, int x);
-
-    //递归删除
-    Node* remove(Node* root, int x);
-
-    //递归查找
-    Node* find(Node* root, int x);
-
-    Node* find_max(Node* root);
-
-    Node* find_min(Node* root);
-};
+#include "avl_tree.h"
+#include <iostream>
+using namespace std;
 
 //LL平衡旋转 (向右单旋转)
 //假定根节点为A，左孩子为B, 因为左孩子B的左子树BL插入节点导致了不平衡
@@ -144,11 +80,11 @@ Node* AVLTree::balance(Node* root)
         //child factor 与 0比较
         if (child_factor > 0) {
             //1.1 左子树(L)的左孩子(L)更高
-            LL_rotate(root);
+            root = LL_rotate(root);
 
         } else {
             //1.2 左子树(L)的右孩子(R)更高
-            LR_rotate(root);
+            root = LR_rotate(root);
         }
         //2. 如果右子树树高更高
     } else if (root_factor < -1) {
@@ -157,20 +93,42 @@ Node* AVLTree::balance(Node* root)
         //child factor 与 0比较
         if (child_factor > 0) {
             //2.1 右子树(R)的左孩子(L)更高
-            RL_rotate(root);
+            root = RL_rotate(root);
         } else {
             //2.2 右子树(R)的右孩子(R)更高
-            RR_rotate(root);
+            root = RR_rotate(root);
         }
     }
     //返回平衡后的根节点
     return root;
 }
 
-//插入
-Node* AVLTree::insert(int x)
+//返回前驱节点，是二叉搜索树的最左节点
+Node* AVLTree::find_min(Node* root)
 {
-    return insert(root, x);
+    if (root == nullptr)
+        return root;
+    while (root->left != nullptr) {
+        root = root->left;
+    }
+    return root;
+}
+
+//返回后继节点，是二叉搜索树的最右节点
+Node* AVLTree::find_max(Node* root)
+{
+    if (root == nullptr)
+        return root;
+    while (root->right != nullptr) {
+        root = root->right;
+    }
+    return root;
+}
+
+//插入
+void AVLTree::insert(int x)
+{
+    tree_root = insert(tree_root, x);
 }
 
 //递归插入
@@ -178,7 +136,8 @@ Node* AVLTree::insert(Node* root, int x)
 {
     //终结条件
     if (root == nullptr) {
-        return new Node(x);
+        root = new Node(x);
+        return root;
     }
     //左右子树判断
     if (root->val > x) {
@@ -192,9 +151,9 @@ Node* AVLTree::insert(Node* root, int x)
     return root;
 }
 
-Node* AVLTree::remove(int x)
+void AVLTree::remove(int x)
 {
-    return remove(root, x);
+    tree_root = remove(tree_root, x);
 }
 
 //递归删除
@@ -240,11 +199,11 @@ Node* AVLTree::remove(Node* root, int x)
         //继续在左子树搜索
         root->left = remove(root->left, x);
         //如果删除可能造成不平衡，需要进行平衡操作
-        balance(root);
+        root = balance(root);
     } else {
         //继续在右子树搜索
         root->right = remove(root->right, x);
-        balance(root);
+        root = balance(root);
     }
     //返回根节点
     return root;
@@ -252,7 +211,7 @@ Node* AVLTree::remove(Node* root, int x)
 
 Node* AVLTree::find(int x)
 {
-    return find(root, x);
+    return find(tree_root, x);
 }
 
 //递归查找
@@ -263,4 +222,61 @@ Node* AVLTree::find(Node* root, int x)
     if (root->val > x)
         return find(root->left, x);
     return find(root->right, x);
+}
+
+void AVLTree::build(int arr[], int size)
+{
+    for (int i = 0; i < size; i++) {
+        insert(arr[i]);
+    }
+}
+
+void AVLTree::pre_order_traverse()
+{
+    cout << "pre order: ";
+    pre_order_traverse(tree_root);
+}
+
+void AVLTree::pre_order_traverse(Node* root)
+{
+    if (root == nullptr)
+        return;
+    pre_order_traverse(root->left);
+    cout << root->val << " ";
+    pre_order_traverse(root->right);
+}
+
+void AVLTree::mid_order_traverse()
+{
+    cout << "mid orde: ";
+    mid_order_traverse(tree_root);
+}
+
+void AVLTree::mid_order_traverse(Node* root)
+{
+    if (root == nullptr)
+        return;
+    cout << root->val << " ";
+    mid_order_traverse(root->left);
+    mid_order_traverse(root->right);
+}
+
+void AVLTree::print()
+{
+    pre_order_traverse();
+    cout << endl;
+    mid_order_traverse();
+    cout << endl;
+}
+
+int main()
+{
+    int arr[] = { 8, 3, 1, 4, 7, 5, 2, 6 };
+    AVLTree avl;
+    avl.build(arr, 8);
+    avl.print();
+    for (int i = 1; i < 9; i++) {
+        avl.remove(i);
+        avl.print();
+    }
 }
