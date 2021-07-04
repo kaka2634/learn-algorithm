@@ -10,6 +10,8 @@ enum COLOR { RED,
 //树节点一般key和value相同，当然也可以保存为键值对
 //节点结构这里将key和value区分
 //因为红黑树主要应用场景的key和value不相同
+
+//K key-type, V value-type
 template <class K, class V>
 class Node {
 public:
@@ -38,19 +40,31 @@ public:
     void insert(K key, V value);
     void remove(K key);
 
+    //测试接口
+    void pre_order_traverse();
+    void mid_order_traverse();
+    void print();
+
 private:
     Node<K, V>* root;
 
     //旋转操作
-    Node<K, V>* rotate_left(Node<K, V>* node);
-    Node<K, V>* rotate_right(Node<K, V>* node);
+    Node<K, V>* rotate_left(Node<K, V>* p);
+    Node<K, V>* rotate_right(Node<K, V>* p);
 
     //变色
-    void flip_colors(Node<K, V>* node);
+    void flip_colors(Node<K, V>* p);
 
     //平衡操作
-    void insert_balance(Node<K, V>* node);
-    void remove_balance(Node<K, V>* node);
+    Node<K, V>* insert_balance(Node<K, V>* p, Node<K, V>* s);
+    Node<K, V>* remove_balance(Node<K, V>* p);
+
+    //插入
+    Node<K, V>* insert(Node<K, V>* p, K key, V value);
+
+    //遍历
+    void pre_order_traverse(Node<K, V>* p);
+    void mid_order_traverse(Node<K, V>* p);
 };
 
 #endif
