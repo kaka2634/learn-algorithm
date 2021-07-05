@@ -17,17 +17,17 @@ class Node {
 public:
     K key;
     V value;
-    Node<K, V>* left;
-    Node<K, V>* right;
-    Node<K, V>* parent;
+    Node* left;
+    Node* right;
+    Node* parent;
     COLOR color;
-    Node(K key_, V value_, COLOR color_,Node<K, V>* parent_ = nullptr)
+    Node(K key_, V value_, COLOR color_)
     {
         key = key_;
         value = value_;
         left = nullptr;
         right = nullptr;
-        parent = parent_;
+        parent = nullptr;
         color = color_;
     }
 };
@@ -61,8 +61,11 @@ private:
     void flip_colors(Node<K, V>* p);
 
     //平衡操作
-    void insert_balance(Node<K, V>* node);
-    void remove_balance(Node<K, V>* p);
+    Node<K, V>* insert_balance(Node<K, V>* p, Node<K, V>* s);
+    Node<K, V>* remove_balance(Node<K, V>* p);
+
+    //插入
+    Node<K, V>* insert(Node<K, V>* p, K key, V value);
 
     //遍历
     void pre_order_traverse(Node<K, V>* p);
