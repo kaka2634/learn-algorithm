@@ -103,7 +103,7 @@ Node* AVLTree::balance(Node* root)
     return root;
 }
 
-//返回前驱节点，是二叉搜索树的最左节点
+//返回二叉搜索树的最左节点，用于查找右子树中的后继节点（右子树中最小）
 Node* AVLTree::find_min(Node* root)
 {
     if (root == nullptr)
@@ -114,7 +114,7 @@ Node* AVLTree::find_min(Node* root)
     return root;
 }
 
-//返回后继节点，是二叉搜索树的最右节点
+//返回前最右节点，用于查找左子树中的前驱节点（左子树中最大）
 Node* AVLTree::find_max(Node* root)
 {
     if (root == nullptr)
