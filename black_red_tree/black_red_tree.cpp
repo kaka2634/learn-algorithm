@@ -63,7 +63,7 @@ template <class K, class V>
 void BRTree<K, V>::insert(K key, V value)
 {
     //插入情景1：红黑树为空树，需插入黑色节点
-    if (root ==  nullptr) {
+    if (root == nullptr) {
         root = new Node<K, V>(key, value, BLACK);
         return;
     }
@@ -147,6 +147,7 @@ void BRTree<K, V>::insert_balance(Node<K, V>* s)
                 pp->color = RED;
                 //调用while 循环继续向上
                 s = pp;
+                p = s->parent;
                 continue;
             }
 
@@ -168,6 +169,171 @@ void BRTree<K, V>::insert_balance(Node<K, V>* s)
     }
     //最后将根节点设为黑色
     root->color = BLACK;
+}
+
+//删除
+template <class K, class V>
+void BRTree<K, V>::remove(K key)
+{
+    Node<K, V>* p = root;
+    while (p != nullptr) {
+        //找到要删除的目标节点
+        if (key == p->key) {
+            //删除情景1：若删除结点无子结点，直接删除
+            if (p->left == nullptr && p->right == nullptr) {
+                //平衡删除
+                remove_balance(p);
+                //先将parent的链接断开
+                if (p->parent->left == p) {
+                    p->parent->left = nullptr;
+                } else {
+                    p->parent->right = nullptr;
+                }
+                delete p;
+                p = nullptr;
+                return;
+            }
+
+            //删除情景2：若删除结点只有一个子结点，用子结点替换删除结点
+            Node<K, V>* replace;
+            if (p->left == nullptr) {
+                replace = p->right;
+                //将替换节点值到需要删除节点的位置
+                p->key = replace->key;
+                p->value = replace->value;
+                //移到遍历指针p
+                p = p->right;
+            } else if (p->right == nullptr) {
+                replace = p->left;
+                p->key = replace->key;
+                p->value = replace->value;
+                p = p->left;
+            } else {
+                //删除情景3: 若删除结点有两个子结点，用后继结点（大于删除结点的最小结点）替换删除结点
+                replace = find_min(p->right);
+                p->key = replace->key;
+                p->value = replace->value;
+                p = p->right;
+            }
+
+            //将所寻找的key修改为替换节点的key, 从而继续执行remove 移除掉替换节点
+            key = replace->key;
+        }
+        //继续寻找子树， 这里一定要用else，因为key在前面相等时会被修改
+        else if (key < p->key) {
+            p = p->left;
+        } else {
+            p = p->right;
+        }
+    }
+    return;
+}
+
+//Node p: parent, s: son, pp: gandparent u:uncle b: brother
+template <class K, class V>
+void BRTree<K, V>::remove_balance(Node<K, V>* s)
+{
+    //删除情景1：替换结点是红色结点, 没有任何影响，直接删除
+
+    //删除情景2：替换结点是黑结点
+    //保证s 不是root 节点
+    while (s->color == BLACK && s->parent != nullptr) {
+        Node<K, V>* p = s->parent;
+        //删除情景2.1 替换结点是其父结点的左子结点
+        if (p->left == s) {
+            Node<K, V>* b = p->right;
+            //删除情景2.1.1：替换结点的兄弟结点是红结点
+            if (b->color == RED) {
+                b->color = BLACK;
+                p->color = RED;
+                //变成删除情景2.1.2.3
+                p = rotate_left(p);
+                b = p->right;
+                s = p->left;
+            }
+            //删除情景2.1.2：替换结点的兄弟结点是黑结点
+            if (b->color == BLACK) {
+                //删除情景2.1.2.3：替换结点的兄弟结点的子结点都为黑结点(NIL也是黑色节点)
+                if ((b->left == nullptr || b->left->color == BLACK)
+                    && (b->right == nullptr || b->right->color == BLACK)) {
+                    b->color = RED;
+                    //p 作为新的替换节点, 继续删除平衡操作
+                    s = p;
+                } else {
+                    //删除情景2.1.2.2：替换结点的兄弟结点的右子结点为黑结点，左子结点为红结点
+                    if ((b->right == nullptr || b->right->color == BLACK)) {
+                        b->color = RED;
+                        if (b->left != nullptr) {
+                            b->left->color = BLACK;
+                        }
+                        //转换为删除情景2.1.2.1
+                        b = rotate_right(b); //rotate之后更新新的兄弟节点
+                    }
+
+                    //删除情景2.1.2.1：替换结点的兄弟结点的右子结点是红结点，左子结点任意颜色
+                    b->color = p->color;
+                    p->color = BLACK;
+                    if (p->right->color = RED) {
+                        p->right->color = BLACK;
+                    }
+                    p = rotate_left(p);
+                    return;
+                }
+            }
+        } else {
+
+            Node<K, V>* b = p->left;
+            //删除情景2.2.1：替换结点的兄弟结点是红结点
+            if (b->color == RED) {
+                b->color = BLACK;
+                p->color = RED;
+                //变成删除情景2.2.2.3
+                p = rotate_right(p);
+                b = p->left;
+                s = p->right;
+            }
+            //删除情景2.2.2：替换结点的兄弟结点是黑结点
+            if (b->color == BLACK) {
+                //删除情景2.2.2.3：替换结点的兄弟结点的子结点都为黑结点(NIL也是黑色节点)
+                if ((b->left == nullptr || b->left->color == BLACK)
+                    && (b->right == nullptr || b->right->color == BLACK)) {
+                    b->color = RED;
+                    //p 作为新的替换节点, 继续删除平衡操作
+                    s = p;
+                } else {
+                    //删除情景2.2.2.2：替换结点的兄弟结点的左子结点为黑结点，右子结点为红结点
+                    if ((b->left == nullptr || b->left->color == BLACK)) {
+                        b->color = RED;
+                        if (b->right != nullptr) {
+                            b->right->color = BLACK;
+                        }
+                        //转换为删除情景2.2.2.1
+                        b = rotate_left(b); //rotate之后更新新的兄弟节点
+                    }
+
+                    //删除情景2.2.2.1：替换结点的兄弟结点的左子结点是红结点，右子结点任意颜色
+                    b->color = p->color;
+                    p->color = BLACK;
+                    if (p->left->color = RED) {
+                        p->left->color = BLACK;
+                    }
+                    p = rotate_right(p);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+template <class K, class V>
+Node<K, V>* BRTree<K, V>::find_min(Node<K, V>* p)
+{
+    if (p == nullptr)
+        return p;
+    while (p->left != nullptr) {
+        p = p->left;
+    }
+    return p;
 }
 
 //遍历
@@ -216,10 +382,16 @@ void BRTree<K, V>::print()
 int main()
 {
     BRTree<int, int> tree;
-    int arr[] = {10, 40, 30, 60, 90, 70, 20, 50, 80};
+    int arr[] = { 10, 40, 30, 60, 90, 70, 20, 50, 80 };
     for (int i = 0; i < 9; i++) {
         tree.insert(arr[i], i);
     }
+    // tree.print();
+
+    tree.remove(80);
+    tree.remove(10);
+    tree.remove(50);
+    tree.remove(40);
     tree.print();
     return 0;
 }

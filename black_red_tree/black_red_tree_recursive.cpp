@@ -107,15 +107,17 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* p, Node<K, V>* s)
             if (s == p->right) {
                 //先进行左旋，使之成为4.2.1场景
                 p = rotate_left(p);
-                std::cout << p->key << std::endl;
-                p->parent->left = p;
+                p_parent = p->parent;
+                p_parent->left = p;
             }
 
             //插入情景4.2.1: 插入结点是其父节点的左儿子 （L-L型）
-            p->parent = rotate_right(p->parent);
+            p_parent = rotate_right(p_parent);
+            p = p_parent->left;
             //变色
-            p->parent->color = BLACK;
-            p->parent->right->color = RED;
+            p_parent->color = BLACK;
+            p_parent->right->color = RED;
+            return p_parent;
 
         } else {
             //如果父节点是祖父节点的右孩子
@@ -142,9 +144,9 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* p, Node<K, V>* s)
             //变色
             p_parent->color = BLACK;
             p_parent->left->color = RED;
+            return p_parent;
         }
     }
-    return p;
 }
 
 //遍历

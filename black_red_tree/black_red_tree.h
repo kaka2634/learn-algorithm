@@ -61,8 +61,11 @@ private:
     void flip_colors(Node<K, V>* p);
 
     //平衡操作
-    void insert_balance(Node<K, V>* node);
-    void remove_balance(Node<K, V>* p);
+    void insert_balance(Node<K, V>* s);
+    void remove_balance(Node<K, V>* s);
+
+    //查找操作
+    Node<K, V>* find_min(Node<K, V>* p);
 
     //遍历
     void pre_order_traverse(Node<K, V>* p);
