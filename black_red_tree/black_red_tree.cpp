@@ -379,6 +379,36 @@ void BRTree<K, V>::print()
     mid_order_traverse();
 }
 
+template <class K, class V>
+bool BRTree<K, V>::is_balance()
+{
+    if (root != nullptr && root->color == RED)
+        return false;
+
+    int target_black_num = 0;
+    Node<K, V>* p = root;
+    while (p != nullptr) {
+        if (p->color == BLACK)
+            target_black_num++;
+        p = p->left;
+    }
+
+    return is_balance(root, 0, target_black_num);
+}
+
+template <class K, class V>
+bool BRTree<K, V>::is_balance(Node<K, V>* p, int cur_black_num, int target_black_num)
+{
+    if (p == nullptr)
+        return cur_black_num == target_black_num;
+    if (p->color == RED && p->parent->color == RED)
+        return false;
+    if (p->color == BLACK)
+        cur_black_num++;
+    return is_balance(p->left, cur_black_num, target_black_num)
+        && is_balance(p->right, cur_black_num, target_black_num);
+}
+
 int main()
 {
     BRTree<int, int> tree;
@@ -388,10 +418,11 @@ int main()
     }
     // tree.print();
 
-    tree.remove(80);
-    tree.remove(10);
-    tree.remove(50);
-    tree.remove(40);
+    // tree.remove(80);
+    // tree.remove(10);
+    // tree.remove(50);
+    // tree.remove(40);
     tree.print();
+    std::cout << tree.is_balance();
     return 0;
 }

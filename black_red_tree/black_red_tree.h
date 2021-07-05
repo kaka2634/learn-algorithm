@@ -21,7 +21,7 @@ public:
     Node<K, V>* right;
     Node<K, V>* parent;
     COLOR color;
-    Node(K key_, V value_, COLOR color_,Node<K, V>* parent_ = nullptr)
+    Node(K key_, V value_, COLOR color_, Node<K, V>* parent_ = nullptr)
     {
         key = key_;
         value = value_;
@@ -49,6 +49,7 @@ public:
     void pre_order_traverse();
     void mid_order_traverse();
     void print();
+    bool is_balance();
 
 private:
     Node<K, V>* root;
@@ -70,6 +71,7 @@ private:
     //遍历
     void pre_order_traverse(Node<K, V>* p);
     void mid_order_traverse(Node<K, V>* p);
+    bool is_balance(Node<K, V>* p, int cur_black_num, int target_black_num);
 };
 
 #endif
