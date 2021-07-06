@@ -5,6 +5,7 @@
 //     p
 //    / \       
 //   pl  s
+//rotate 方法会更新树的形状，返回值是用于更新根节点指针的指向
 template <class K, class V>
 Node<K, V>* BRTree<K, V>::rotate_left(Node<K, V>* p)
 {
@@ -259,6 +260,7 @@ void BRTree<K, V>::remove_balance(Node<K, V>* s)
                     b->color = RED;
                     //p 作为新的替换节点, 继续删除平衡操作
                     s = p;
+                    continue;
                 } else {
                     //删除情景2.1.2.2：替换结点的兄弟结点的右子结点为黑结点，左子结点为红结点
                     if ((b->right == nullptr || b->right->color == BLACK)) {
@@ -273,8 +275,8 @@ void BRTree<K, V>::remove_balance(Node<K, V>* s)
                     //删除情景2.1.2.1：替换结点的兄弟结点的右子结点是红结点，左子结点任意颜色
                     b->color = p->color;
                     p->color = BLACK;
-                    if (p->right->color = RED) {
-                        p->right->color = BLACK;
+                    if (b->right != nullptr) {
+                        b->right->color = BLACK;
                     }
                     p = rotate_left(p);
                     return;
@@ -300,6 +302,7 @@ void BRTree<K, V>::remove_balance(Node<K, V>* s)
                     b->color = RED;
                     //p 作为新的替换节点, 继续删除平衡操作
                     s = p;
+                    continue;
                 } else {
                     //删除情景2.2.2.2：替换结点的兄弟结点的左子结点为黑结点，右子结点为红结点
                     if ((b->left == nullptr || b->left->color == BLACK)) {
@@ -314,8 +317,8 @@ void BRTree<K, V>::remove_balance(Node<K, V>* s)
                     //删除情景2.2.2.1：替换结点的兄弟结点的左子结点是红结点，右子结点任意颜色
                     b->color = p->color;
                     p->color = BLACK;
-                    if (p->left->color = RED) {
-                        p->left->color = BLACK;
+                    if (b->left != nullptr) {
+                        b->left->color = BLACK;
                     }
                     p = rotate_right(p);
                     return;
@@ -365,7 +368,7 @@ void BRTree<K, V>::mid_order_traverse(Node<K, V>* p)
 
     if (p == nullptr)
         return;
-    std::cout << "Key: " << p->key << "Color: " << p->color << std::endl;
+    std::cout << "Key: " << p->key << " Color: " << p->color << std::endl;
     mid_order_traverse(p->left);
     mid_order_traverse(p->right);
 }
@@ -416,13 +419,15 @@ int main()
     for (int i = 0; i < 9; i++) {
         tree.insert(arr[i], i);
     }
-    // tree.print();
-
-    // tree.remove(80);
-    // tree.remove(10);
-    // tree.remove(50);
-    // tree.remove(40);
+    std::cout << "After inserted, tree is" << std::endl;
     tree.print();
-    std::cout << tree.is_balance();
+
+    int arr2[] = { 80, 10, 50, 40 };
+    for (int i = 0; i < 4; i++) {
+        tree.remove(arr2[i]);
+        std::cout << "remove value: " << arr2[i] << " tree balance check : " << tree.is_balance() << std::endl;
+    }
+    std::cout << "After removed, tree is" << std::endl;
+    tree.print();
     return 0;
 }
