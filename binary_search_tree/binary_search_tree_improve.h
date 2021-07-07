@@ -30,10 +30,11 @@ public:
     void remove(K key);
 
     //测试接口
+    void print();
 
 private:
     //根节点
-    Node<K, V> root;
+    Node<K, V>* root;
 
     //递归实现基本操作
     Node<K, V>* insert(Node<K, V>* p, K key, V value);
@@ -42,4 +43,8 @@ private:
 
     //用于返回后继节点
     Node<K, V>* find_min(Node<K, V>* p);
+
+    //遍历
+    void pre_order_traverse(Node<K, V>* p);
+    void mid_order_traverse(Node<K, V>* p);
 };

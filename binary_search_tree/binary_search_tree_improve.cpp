@@ -12,7 +12,8 @@ BSTree<K, V>::BSTree()
 template <class K, class V>
 void BSTree<K, V>::insert(K key, V value)
 {
-    insert(root, key, value);
+    //注意： 这里要更新root节点
+    root = insert(root, key, value);
 }
 
 template <class K, class V>
@@ -20,7 +21,7 @@ Node<K, V>* BSTree<K, V>::insert(Node<K, V>* p, K key, V value)
 {
     //终结条件1: 到达null节点，需新建节点返回，完成插入
     if (p == nullptr) {
-        p = new Node(key, value);
+        p = new Node<K, V>(key, value);
         return p;
     }
 
@@ -48,7 +49,7 @@ Node<K, V>* BSTree<K, V>::find(K key)
 }
 
 template <class K, class V>
-Node<K, V>* BSTree<K, V>::find(K key)
+Node<K, V>* BSTree<K, V>::find(Node<K, V>* p, K key)
 {
     //终结条件: 到达null节点，或者找到对应节点
     if (p == nullptr || p->key == key) {
@@ -57,9 +58,9 @@ Node<K, V>* BSTree<K, V>::find(K key)
 
     //根据二叉搜索树的性质继续寻找
     if (key < p->key) {
-        return find(p->left, x);
+        return find(p->left, key);
     } else {
-        return find(p->right, x);
+        return find(p->right, key);
     }
 }
 
@@ -67,7 +68,8 @@ Node<K, V>* BSTree<K, V>::find(K key)
 template <class K, class V>
 void BSTree<K, V>::remove(K key)
 {
-    return remove(root, key);
+    //注意： 这里要更新root节点
+    root = remove(root, key);
 }
 
 template <class K, class V>
@@ -89,19 +91,19 @@ Node<K, V>* BSTree<K, V>::remove(Node<K, V>* p, K key)
         //2. 如果只有一个孩子，那么直接将孩子节点作为替换节点, 同时删除节点
         // 因为前面已经判断了两个都是nullptr的情况，这里只需判断一个孩子即可
         if (p->left == nullptr) {
-            Node* replace = p->right;
+            Node<K, V>* replace = p->right;
             delete p;
             p = nullptr;
             return replace;
         } else if (p->right == nullptr) {
-            Node* replace = p->left;
+            Node<K, V>* replace = p->left;
             delete p;
             p = nullptr;
             return replace;
         }
 
         //3. 剩下就是左右孩子都存在的情况，这里可以寻找后继节点作为替换节点（也可以使用前驱节点）
-        Node* replace = find_min(p->right);
+        Node<K, V>* replace = find_min(p->right);
         p->key = replace->key;
         p->value = replace->value;
         //注意：这里使用的树节点删除技巧，删除节点需要找到一个替代节点，将替代节点放到删除节点位置从而不会破坏树的性质。
@@ -113,11 +115,67 @@ Node<K, V>* BSTree<K, V>::remove(Node<K, V>* p, K key)
         }
     }
     //注意： 这里需要用else if，因为key的值可能会在前面替换节点时被修改了
-    else if (key < p->val) {
-        //选择左子树，同时连接删除后的节点
+    //同时，递归删除树同样需要将返回值用于更新左右子树指针
+    else if (key < p->key) {
         p->left = remove(p->left, key);
     } else {
-        //选择右子树，同时连接删除后的节点
         p->right = remove(p->right, key);
     }
+    return p;
+}
+
+//返回节点p的最左子树节点 
+template <class K, class V>
+Node<K, V>* BSTree<K, V>::find_min(Node<K, V>* p)
+{
+    if (p == nullptr)
+        return p;
+    while (p->left != nullptr) {
+        p = p->left;
+    }
+    return p;
+}
+
+//遍历
+template <class K, class V>
+void BSTree<K, V>::pre_order_traverse(Node<K, V>* p)
+{
+    if (p == nullptr)
+        return;
+    pre_order_traverse(p->left);
+    cout << "Key: " << p->key << endl;
+    pre_order_traverse(p->right);
+}
+
+template <class K, class V>
+void BSTree<K, V>::mid_order_traverse(Node<K, V>* p)
+{
+
+    if (p == nullptr)
+        return;
+    cout << "Key: " << p->key << endl;
+    mid_order_traverse(p->left);
+    mid_order_traverse(p->right);
+}
+
+template <class K, class V>
+void BSTree<K, V>::print()
+{
+    cout << "Pre order: " << endl;
+    pre_order_traverse(root);
+    cout << "Mid order: " << endl;
+    mid_order_traverse(root);
+}
+
+int main()
+{
+    BSTree<int, int> tree;
+    int arr[] = { 10, 40, 30, 60, 90, 70, 20, 50, 80 };
+    for (int i = 0; i < 9; i++) {
+        tree.insert(arr[i], i);
+    }
+    tree.print();
+    tree.remove(10);
+    tree.print();
+    return 0;
 }
