@@ -132,6 +132,189 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* pp, Node<K, V>* p, Node<K, 
     return pp;
 }
 
+//删除
+template <class K, class V>
+void BRTree<K, V>::remove(K key)
+{
+    bool balance_indicator = false;
+    root = remove(root, key, balance_indicator);
+}
+
+template <class K, class V>
+Node<K, V>* BRTree<K, V>::remove(Node<K, V>* p, K key, bool& balance_indicator)
+{
+    //终结条件1: 到达null节点，仍然没能找到，返回nullptr
+    if (p == nullptr) {
+        return p;
+    }
+
+    //终结条件2： 找到删除节点
+    if (p->key == key) {
+        //1. 如果没有左右孩子，直接删除该节点
+        if (p->left == nullptr && p->right == nullptr) {
+
+            //删除情景2：替换结点是黑结点, 才需要平衡，通过balance_indicator告诉parent节点
+            if (p->color == BLACK) {
+                balance_indicator = true;
+            }
+            delete p;
+            p = nullptr;
+            return p;
+        }
+
+        Node<K, V>* replace = nullptr;
+        //2. 如果只有一个孩子，那么直接将孩子节点作为替换节点
+        if (p->left == nullptr) {
+            replace = p->right;
+        } else if (p->right == nullptr) {
+            replace = p->left;
+        } else {
+            //3. 剩下就是左右孩子都存在的情况，这里可以寻找后继节点作为替换节点（也可以使用前驱节点）
+            replace = find_min(p->right);
+        }
+
+        //注意：与二叉搜索树的不同， 对于红黑树，需要将情况2的节点替换而不是直接删除，需要等到到叶子节点才能删除
+        p->key = replace->key;
+        p->value = replace->value;
+        //注意：这里使用的树节点删除技巧，删除节点需要找到一个替代节点，将替代节点放到删除节点位置从而不会破坏树的性质。
+        //再继续调用同样删除操作去将替换节点删除（更换key值），直到整个树在删除节点后满足基本性质。
+        if (key > replace->key) {
+            p->left = remove(p->left, replace->key, balance_indicator);
+            if (balance_indicator) {
+                p = remove_balance(p, p->right, balance_indicator);
+            }
+        } else {
+            p->right = remove(p->right, replace->key, balance_indicator);
+            if (balance_indicator) {
+                p = remove_balance(p, p->left, balance_indicator);
+            }
+        }
+
+    }
+    //注意： 这里需要用else if，因为key的值可能会在前面替换节点时被修改了
+    //同时，递归删除树同样需要将返回值用于更新左右子树指针
+    else if (key < p->key) {
+        p->left = remove(p->left, key, balance_indicator);
+        if (balance_indicator) {
+            p = remove_balance(p, p->right, balance_indicator);
+        }
+
+    } else {
+        p->right = remove(p->right, key, balance_indicator);
+        if (balance_indicator) {
+            p = remove_balance(p, p->left, balance_indicator);
+        }
+    }
+    return p;
+}
+
+//删除平衡
+//p: parent 父节点
+//s: sibling 兄弟节点
+template <class K, class V>
+Node<K, V>* BRTree<K, V>::remove_balance(Node<K, V>* p, Node<K, V>* s, bool& balance_indicator)
+{
+
+    //删除情景2.1：替换结点是其父结点的左子结点
+    if (p->right == s) {
+        //删除情景2.1.1：替换结点的兄弟结点是红结点
+        if (s->color == RED) {
+            s->color = BLACK;
+            p->color = RED;
+            //变成删除情景2.1.2.3
+            p = rotate_left(p);
+            s = p->right;
+        }
+        //删除情景2.1.2：替换结点的兄弟结点是黑结点
+        if (s->color == BLACK) {
+            //删除情景2.1.2.3：替换结点的兄弟结点的子结点都为黑结点(NIL也是黑色节点)
+            if ((s->left == nullptr || s->left->color == BLACK)
+                && (s->right == nullptr || s->right->color == BLACK)) {
+                s->color = RED;
+                //p 视为新的替换节点, 不改变indicator，返回后继续删除平衡操作
+                return p;
+            } else {
+                //删除情景2.1.2.2：替换结点的兄弟结点的右子结点为黑结点，左子结点为红结点
+                if ((s->right == nullptr || s->right->color == BLACK)) {
+                    s->color = RED;
+                    if (s->left != nullptr) {
+                        s->left->color = BLACK;
+                    }
+                    //转换为删除情景2.1.2.1
+                    s = rotate_right(s); //rotate之后更新新的兄弟节点
+                    //注意：这里要将新的s链接上p
+                    p->right = s;
+                }
+
+                //删除情景2.1.2.1：替换结点的兄弟结点的右子结点是红结点，左子结点任意颜色
+                s->color = p->color;
+                p->color = BLACK;
+                if (s->right != nullptr) {
+                    s->right->color = BLACK;
+                }
+                p = rotate_left(p);
+                //平衡indicator 清除
+                balance_indicator = false;
+                return p;
+            }
+        }
+    } else {
+        //删除情景2.2.1：替换结点的兄弟结点是红结点
+        if (s->color == RED) {
+            s->color = BLACK;
+            p->color = RED;
+            //变成删除情景2.2.2.3
+            p = rotate_right(p);
+            s = p->left;
+        }
+        //删除情景2.2.2：替换结点的兄弟结点是黑结点
+        if (s->color == BLACK) {
+            //删除情景2.2.2.3：替换结点的兄弟结点的子结点都为黑结点(NIL也是黑色节点)
+            if ((s->left == nullptr || s->left->color == BLACK)
+                && (s->right == nullptr || s->right->color == BLACK)) {
+                s->color = RED;
+                //p 视为新的替换节点, 不改变indicator，返回后继续删除平衡操作
+                return p;
+            } else {
+                //删除情景2.2.2.2：替换结点的兄弟结点的左子结点为黑结点，右子结点为红结点
+                if ((s->left == nullptr || s->left->color == BLACK)) {
+                    s->color = RED;
+                    if (s->right != nullptr) {
+                        s->right->color = BLACK;
+                    }
+                    //转换为删除情景2.2.2.1
+                    s = rotate_left(s); //rotate之后更新新的兄弟节点
+                    //注意：这里要将新的s链接上p
+                    p->left = s;
+                }
+
+                //删除情景2.2.2.1：替换结点的兄弟结点的左子结点是红结点，右子结点任意颜色
+                s->color = p->color;
+                p->color = BLACK;
+                if (s->left != nullptr) {
+                    s->left->color = BLACK;
+                }
+                p = rotate_right(p);
+                //平衡indicator 清除
+                balance_indicator = false;
+                return p;
+            }
+        }
+    }
+}
+
+//返回节点p的最左子树节点，用于找到后继节点
+template <class K, class V>
+Node<K, V>* BRTree<K, V>::find_min(Node<K, V>* p)
+{
+    if (p == nullptr)
+        return p;
+    while (p->left != nullptr) {
+        p = p->left;
+    }
+    return p;
+}
+
 //遍历
 template <class K, class V>
 void BRTree<K, V>::pre_order_traverse(Node<K, V>* p)
@@ -204,6 +387,13 @@ int main()
     }
     std::cout << "After inserted, tree is" << std::endl;
     tree.print();
-    std::cout << tree.is_balance() << std::endl;
+
+    int arr2[] = { 80, 10, 50, 40 };
+    for (int i = 0; i < 4; i++) {
+        tree.remove(arr2[i]);
+        std::cout << "remove value: " << arr2[i] << " tree balance check : " << tree.is_balance() << std::endl;
+    }
+    std::cout << "After removed, tree is" << std::endl;
+    tree.print();
     return 0;
 }
