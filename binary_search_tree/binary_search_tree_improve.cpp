@@ -108,7 +108,8 @@ Node<K, V>* BSTree<K, V>::remove(Node<K, V>* p, K key)
         p->value = replace->value;
         //注意：这里使用的树节点删除技巧，删除节点需要找到一个替代节点，将替代节点放到删除节点位置从而不会破坏树的性质。
         //再继续调用同样删除操作去将替换节点删除（更换key值），直到整个树在删除节点后满足基本性质。
-        if (key < replace->key) {
+        if (key > replace->key) {
+            //key 比 replace 大，说明替换节点在左子树， 这与搜索条件刚好不同， 因为这里搜索的实际是replace->key, key表示的是p->key
             p->left = remove(p->left, replace->key);
         } else {
             p->right = remove(p->right, replace->key);
@@ -124,7 +125,7 @@ Node<K, V>* BSTree<K, V>::remove(Node<K, V>* p, K key)
     return p;
 }
 
-//返回节点p的最左子树节点 
+//返回节点p的最左子树节点
 template <class K, class V>
 Node<K, V>* BSTree<K, V>::find_min(Node<K, V>* p)
 {
@@ -175,7 +176,10 @@ int main()
         tree.insert(arr[i], i);
     }
     tree.print();
-    tree.remove(10);
+    int arr2[] = { 80, 10, 50, 40 };
+    for (int i = 0; i < 4; i++) {
+        tree.remove(arr2[i]);
+    }
     tree.print();
     return 0;
 }
