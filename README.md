@@ -13,7 +13,7 @@
 - [x] [二叉堆 heap](heap)
 - [x] [二叉搜索树 binary_search_tree](binary_search_tree)    
 - [x] [AVL平衡搜索树 avl_tree](avl_tree) 
-- [ ] [红黑树 black_red_tree](black_red_tree) 
+- [x] [红黑树 black_red_tree](black_red_tree) 
 
 #### 算法
 - [x] [图的算法](graph)
@@ -22,4 +22,5 @@
 ### 学习总结
 - [x] [动态数组 vector](vector)
 - [x] [二叉堆 heap](heap)  
+- [ ] [二叉搜索树 binary_search_tree](binary_search_tree)    
 - [ ] [AVL平衡搜索树 avl_tree](avl_tree) 
