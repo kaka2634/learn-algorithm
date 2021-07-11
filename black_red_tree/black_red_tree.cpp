@@ -351,8 +351,8 @@ void BRTree<K, V>::pre_order_traverse(Node<K, V>* p)
 {
     if (p == nullptr)
         return;
-    pre_order_traverse(p->left);
     std::cout << "Key: " << p->key << "Color: " << p->color << std::endl;
+    pre_order_traverse(p->left);
     pre_order_traverse(p->right);
 }
 
@@ -368,8 +368,8 @@ void BRTree<K, V>::mid_order_traverse(Node<K, V>* p)
 
     if (p == nullptr)
         return;
-    std::cout << "Key: " << p->key << " Color: " << p->color << std::endl;
     mid_order_traverse(p->left);
+    std::cout << "Key: " << p->key << " Color: " << p->color << std::endl;
     mid_order_traverse(p->right);
 }
 

@@ -143,8 +143,8 @@ void BSTree<K, V>::pre_order_traverse(Node<K, V>* p)
 {
     if (p == nullptr)
         return;
-    pre_order_traverse(p->left);
     cout << "Key: " << p->key << endl;
+    pre_order_traverse(p->left);
     pre_order_traverse(p->right);
 }
 
@@ -154,8 +154,8 @@ void BSTree<K, V>::mid_order_traverse(Node<K, V>* p)
 
     if (p == nullptr)
         return;
-    cout << "Key: " << p->key << endl;
     mid_order_traverse(p->left);
+    cout << "Key: " << p->key << endl;
     mid_order_traverse(p->right);
 }
 

@@ -241,8 +241,8 @@ void AVLTree::pre_order_traverse(Node* root)
 {
     if (root == nullptr)
         return;
-    pre_order_traverse(root->left);
     cout << root->val << " ";
+    pre_order_traverse(root->left);
     pre_order_traverse(root->right);
 }
 
@@ -256,8 +256,8 @@ void AVLTree::mid_order_traverse(Node* root)
 {
     if (root == nullptr)
         return;
-    cout << root->val << " ";
     mid_order_traverse(root->left);
+    cout << root->val << " ";
     mid_order_traverse(root->right);
 }
 
