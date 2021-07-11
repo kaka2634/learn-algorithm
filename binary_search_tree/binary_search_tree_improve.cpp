@@ -143,7 +143,7 @@ void BSTree<K, V>::pre_order_traverse(Node<K, V>* p)
 {
     if (p == nullptr)
         return;
-    cout << "Key: " << p->key << endl;
+    cout << p->key << " ";
     pre_order_traverse(p->left);
     pre_order_traverse(p->right);
 }
@@ -155,28 +155,34 @@ void BSTree<K, V>::mid_order_traverse(Node<K, V>* p)
     if (p == nullptr)
         return;
     mid_order_traverse(p->left);
-    cout << "Key: " << p->key << endl;
+    cout << p->key << " ";
     mid_order_traverse(p->right);
 }
 
 template <class K, class V>
 void BSTree<K, V>::print()
 {
-    cout << "Pre order: " << endl;
+    cout << "Pre order traverse: ";
     pre_order_traverse(root);
-    cout << "Mid order: " << endl;
+    cout << endl;
+    cout << "Mid order traverse: ";
     mid_order_traverse(root);
 }
 
 int main()
 {
     BSTree<int, int> tree;
+    cout << "*************************************" << endl;
+    cout << "After insert 10, 40, 30, 60, 90, 70, 20, 50, 80:" << endl;
     int arr[] = { 10, 40, 30, 60, 90, 70, 20, 50, 80 };
     for (int i = 0; i < 9; i++) {
         tree.insert(arr[i], i);
     }
     tree.print();
     int arr2[] = { 80, 10, 50, 40 };
+    cout << endl;
+    cout << "*************************************" << endl;
+    cout << "After remove 80, 10, 50, 40:" << endl;
     for (int i = 0; i < 4; i++) {
         tree.remove(arr2[i]);
     }
