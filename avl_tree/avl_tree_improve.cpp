@@ -111,7 +111,7 @@ Node<K, V>* AVLTree<K, V>::balance(Node<K, V>* p)
     return p;
 }
 
-//插入：插入后增加了平衡操作
+//插入：相比于一般二叉搜索树，插入后增加了平衡操作
 template <class K, class V>
 void AVLTree<K, V>::insert(K key, V value)
 {
@@ -193,6 +193,72 @@ Node<K, V>* AVLTree<K, V>::find_max(Node<K, V>* p)
     return p;
 }
 
+//删除: 相比于一般二叉搜索树，增加了删除后的平衡操作
+template <class K, class V>
+void AVLTree<K, V>::remove(K key)
+{
+    root = remove(root, key);
+}
+
+template <class K, class V>
+Node<K, V>* AVLTree<K, V>::remove(Node<K, V>* p, K key)
+{
+    //终结条件1: 到达null节点，仍然没能找到，返回nullptr
+    if (p == nullptr) {
+        return p;
+    }
+
+    //终结条件2： 找到删除节点
+    if (p->key == key) {
+        //1. 如果没有左右孩子，直接删除该节点
+        if (p->left == nullptr && p->right == nullptr) {
+            delete p;
+            p = nullptr;
+            return p;
+        }
+
+        //2. 如果只有一个孩子，那么直接将孩子节点作为替换节点, 同时删除节点
+        if (p->left == nullptr) {
+            Node<K, V>* replace = p->right;
+            delete p;
+            p = nullptr;
+            return replace;
+        } else if (p->right == nullptr) {
+            Node<K, V>* replace = p->left;
+            delete p;
+            p = nullptr;
+            return replace;
+        }
+
+        //3. 剩下就是左右孩子都存在的情况
+        //注意： 这里与一般二叉搜索树的区别，在于要根据树高选择前驱/后继节点作为替换节点
+        int p_factor = get_balance_factor(p);
+        if (p_factor > 0) {
+            //3.1 左子树更高,则将根节点的值更换为前驱节点
+            Node<K, V>* replace = find_max(p->left);
+            p->key = replace->key;
+            p->value = replace->value;
+            p->left = remove(p->left, replace->key);
+        } else {
+            //3.2 右子树更高, 则将根节点的值更换为后继节点
+            Node<K, V>* replace = find_min(p->right);
+            p->key = replace->key;
+            p->value = replace->value;
+            p->right = remove(p->right, replace->key);
+        }
+
+        //注意： 这里需要用else if，因为key的值可能会在前面替换节点时被修改了
+    } else if (key < p->key) {
+        p->left = remove(p->left, key);
+
+    } else {
+        p->right = remove(p->right, key);
+    }
+    //注意： 最后要对节点进行平衡操作
+    p = balance(p);
+    return p;
+}
+
 //遍历
 template <class K, class V>
 void AVLTree<K, V>::pre_order_traverse(Node<K, V>* p)
@@ -225,6 +291,25 @@ void AVLTree<K, V>::print()
     mid_order_traverse(root);
 }
 
+//判断是否平衡
+template <class K, class V>
+bool AVLTree<K, V>::is_balance()
+{
+    return is_balance(root);
+}
+
+template <class K, class V>
+bool AVLTree<K, V>::is_balance(Node<K, V>* p)
+{
+    if (p == nullptr)
+        return true;
+
+    int p_factor = get_balance_factor(p);
+    return p_factor > -2 && p_factor < 2
+        && is_balance(p->left)
+        && is_balance(p->right);
+}
+
 int main()
 {
     AVLTree<int, int> tree;
@@ -235,13 +320,15 @@ int main()
         tree.insert(arr[i], i);
     }
     tree.print();
-    // int arr2[] = { 80, 10, 50, 40 };
-    // cout << endl;
-    // cout << "*************************************" << endl;
-    // cout << "After remove 80, 10, 50, 40:" << endl;
-    // for (int i = 0; i < 4; i++) {
-    //     tree.remove(arr2[i]);
-    // }
-    // tree.print();
+    cout << endl;
+    cout << "*************************************" << endl;
+    int arr2[] = { 80, 10, 50, 40 };
+    for (int i = 0; i < 4; i++) {
+        tree.remove(arr2[i]);
+        cout << "Remove " << arr2[i] << " tree balance check: " << tree.is_balance() << endl;
+    }
+    cout << "*************************************" << endl;
+    cout << "After remove 80, 10, 50, 40:" << endl;
+    tree.print();
     return 0;
 }

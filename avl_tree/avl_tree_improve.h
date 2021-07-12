@@ -37,6 +37,7 @@ public:
     void remove(K key);
 
     //测试接口
+    bool is_balance();
     void print();
 
 private:
@@ -58,6 +59,7 @@ private:
     //LR平衡旋转 (先向左后向右双旋转)：在左孩子(L)的右子树(R)插入导致的不平衡
     Node<K, V>* LR_rotate(Node<K, V>* p);
 
+    //获取高度
     int get_height(Node<K, V>* p);
 
     //获取节点的平衡因子
@@ -78,6 +80,8 @@ private:
     //遍历
     void pre_order_traverse(Node<K, V>* p);
     void mid_order_traverse(Node<K, V>* p);
+
+    bool is_balance(Node<K, V>* p);
 };
 
 #endif
