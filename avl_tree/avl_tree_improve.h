@@ -13,12 +13,14 @@ public:
     V value;
     Node<K, V>* left;
     Node<K, V>* right;
+    int height;
     Node(K key_, V value_)
     {
         key = key_;
         value = value_;
         left = nullptr;
         right = nullptr;
+        height = 0;
     }
 };
 
@@ -42,10 +44,6 @@ public:
 
 private:
     Node<K, V>* root;
-
-    /*********************
-     **    四种旋转方式   **
-     **********************/
 
     //LL平衡旋转 (向右单旋转)：在左孩子(L)的左子树(L)插入导致的不平衡
     Node<K, V>* LL_rotate(Node<K, V>* p);

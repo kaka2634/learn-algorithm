@@ -20,12 +20,14 @@ public:
     V value;
     Node<K, V>* left;
     Node<K, V>* right;
+    int height;
     Node(K key_, V value_)
     {
         key = key_;
         value = value_;
         left = nullptr;
         right = nullptr;
+        height = 0;
     }
 };
 ```
@@ -125,9 +127,13 @@ Node<K, V>* AVLTree<K, V>::insert(Node<K, V>* p, K key, V value)
     //注意：这里相比一般二叉搜索树，在这里增加了平衡语句，这是两者的唯一区别
     //因为平衡操作可能导致根节点变化，同样将返回值用于更新根节点返回
     p = balance(p);
+
+    //插入后还需要更新height
+    p->height = max(get_height(p->left), get_height(p->right)) + 1;
     return p;
 }
 ```
+
 ### 2.4 查找
 与一般二叉搜索树相同
 ```

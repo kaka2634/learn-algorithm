@@ -1,68 +1,57 @@
 #include "avl_tree_improve.h"
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
 //LL平衡旋转 (向右单旋转)
-//假定根节点为A，左孩子为B, 因为左孩子B的左子树BL插入节点导致了不平衡
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::LL_rotate(Node<K, V>* p)
 {
-    //1.先记录左孩子B到temp
-    Node<K, V>* temp = p->left;
-    //2. 将左孩子B的右子树BR 连接 成为节点A的左子树AL
-    p->left = temp->right;
-    //3. 将左孩子B的右孩子更换成为节点A -> 左孩子B向右实现了旋转
-    temp->right = p;
-    //4. 返回左孩子B作为根节点
-    return temp;
+    Node<K, V>* c = p->left;
+    p->left = c->right;
+    c->right = p;
+
+    p->height = max(get_height(p->left), get_height(p->right)) + 1;
+    c->height = max(get_height(c->left), p->height) + 1;
+    return c;
 }
 
-//RR平衡旋转 (向左单旋转) -> 是向右旋转的镜像
-//假定根节点为A，右孩子为B, 因为右孩子B的右子树BR插入节点导致了不平衡
+//RR平衡旋转 (向左单旋转) ，是向右旋转的镜像
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::RR_rotate(Node<K, V>* p)
 {
-    //1.先记录右孩子B到temp
-    Node<K, V>* temp = p->right;
-    //2. 将右孩子B的左子树BL 连接 成为节点A的右子树AR
-    p->right = temp->left;
-    //3. 将右孩子B的左孩子更换成为节点A -> 右孩子B向左实现了旋转
-    temp->left = p;
-    //4. 返回右孩子B作为根节点
-    return temp;
+    Node<K, V>* c = p->right;
+    p->right = c->left;
+    c->left = p;
+
+    p->height = max(get_height(p->left), get_height(p->right)) + 1;
+    c->height = max(get_height(c->right), p->height) + 1;
+    return c;
 }
 
 //RL平衡旋转 (先向右后向左双旋转)
-//假定根节点为A，右孩子为B, 因为右孩子B的左孩子C的子树CL/CR插入节点导致了不平衡
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::RL_rotate(Node<K, V>* p)
 {
-    //1. 先对右孩子B使用LL_rotate, 向右旋转将左孩子C提上来，A的右孩子将从B变为C
     p->right = LL_rotate(p->right);
-    //2. 再对根节点A使用RR_rotate, 向左旋转将此时根节点A的右孩子C提上来
     return RR_rotate(p);
 }
 
 //LR平衡旋转 (先向左后向右双旋转)
-//假定根节点为A，左孩子为B, 因为左孩子B的右孩子的子树CL/CR插入节点导致了不平衡
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::LR_rotate(Node<K, V>* p)
 {
-    //1. 先对左孩子B使用RR_rotate, 向左旋转将右孩子C提上来，A的左孩子将从B变为C
     p->left = RR_rotate(p->left);
-    //2. 再对根节点A使用LL_rotate, 向右旋转将此时根节点A的左孩子C提上来
     return LL_rotate(p);
 }
 
-//获取节点的高度 -> 递归
+//获取节点的高度
 template <class K, class V>
 int AVLTree<K, V>::get_height(Node<K, V>* p)
 {
     if (p == nullptr)
         return 0;
-    int left = get_height(p->left);
-    int right = get_height(p->right);
-    return left > right ? left + 1 : right + 1;
+    return p->height;
 }
 
 //获取节点的平衡因子
@@ -143,6 +132,9 @@ Node<K, V>* AVLTree<K, V>::insert(Node<K, V>* p, K key, V value)
     //注意：这里相比一般二叉搜索树，在这里增加了平衡语句，这是两者的唯一区别
     //因为平衡操作可能导致根节点变化，同样将返回值用于更新根节点返回
     p = balance(p);
+
+    //插入后还需要更新height
+    p->height = max(get_height(p->left), get_height(p->right)) + 1;
     return p;
 }
 
