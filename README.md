@@ -12,7 +12,7 @@
 - [动态数组 vector](vector)
 - [二叉堆 heap](heap)
 - [二叉搜索树 binary_search_tree](binary_search_tree)    
-- [AVL平衡搜索树 avl_tree](avl_tree) 
+- [AVL树 avl_tree](avl_tree) 
 - [红黑树 black_red_tree](black_red_tree) 
 
 #### 算法
@@ -23,6 +23,7 @@
 - [动态数组 vector](vector)
 - [二叉堆 heap](heap)  
 - [二叉搜索树 binary_search_tree](binary_search_tree)    
+- [AVL树 avl_tree](avl_tree) 
 
 ### 任务进度
 以下截图可能存在更新延迟，查看最新任务进度，戳链接 :point_right: [最新项目进展](https://github.com/kaka2634/learn-algorithm/projects/1)
