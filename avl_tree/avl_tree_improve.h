@@ -20,7 +20,7 @@ public:
         value = value_;
         left = nullptr;
         right = nullptr;
-        height = 0;
+        height = 1;
     }
 };
 

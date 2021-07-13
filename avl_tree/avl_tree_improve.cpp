@@ -257,7 +257,7 @@ void AVLTree<K, V>::pre_order_traverse(Node<K, V>* p)
 {
     if (p == nullptr)
         return;
-    cout << p->key << " ";
+    cout << p->key << "(" << p->height << ") ";
     pre_order_traverse(p->left);
     pre_order_traverse(p->right);
 }
@@ -269,7 +269,7 @@ void AVLTree<K, V>::mid_order_traverse(Node<K, V>* p)
     if (p == nullptr)
         return;
     mid_order_traverse(p->left);
-    cout << p->key << " ";
+    cout << p->key << "(" << p->height << ") ";
     mid_order_traverse(p->right);
 }
 
