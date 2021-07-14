@@ -4,28 +4,38 @@
 using namespace std;
 
 //LL平衡旋转 (向右单旋转)
+//假定根节点为P，左孩子为C, 因为左孩子C的左子树CL插入节点导致了不平衡
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::LL_rotate(Node<K, V>* p)
 {
     Node<K, V>* c = p->left;
+    //先将C的右子树CR更换为P的左子树
     p->left = c->right;
+    //再将P降为C的右孩子
     c->right = p;
 
+    //更新P和C的树高
     p->height = max(get_height(p->left), get_height(p->right)) + 1;
     c->height = max(get_height(c->left), p->height) + 1;
+    //最后返回C作为新的子树根节点
     return c;
 }
 
 //RR平衡旋转 (向左单旋转) ，是向右旋转的镜像
+//假定根节点为P，右孩子为C, 因为右孩子C的右子树CR插入节点导致了不平衡
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::RR_rotate(Node<K, V>* p)
 {
     Node<K, V>* c = p->right;
+    //先将C的左子树CL更换为P的右子树
     p->right = c->left;
+    //再将P更新为C的右子树
     c->left = p;
 
+    //更新P和C的树高
     p->height = max(get_height(p->left), get_height(p->right)) + 1;
     c->height = max(get_height(c->right), p->height) + 1;
+    //最后返回C作为新的子树根节点
     return c;
 }
 
