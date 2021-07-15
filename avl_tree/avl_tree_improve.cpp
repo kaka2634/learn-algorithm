@@ -3,29 +3,17 @@
 #include <iostream>
 using namespace std;
 
-//LL平衡旋转 (向右单旋转)
-//假定根节点为P，左孩子为C, 因为左孩子C的左子树CL插入节点导致了不平衡
 template <class K, class V>
-Node<K, V>* AVLTree<K, V>::LL_rotate(Node<K, V>* p)
+AVLTree<K, V>::AVLTree()
 {
-    Node<K, V>* c = p->left;
-    //先将C的右子树CR更换为P的左子树
-    p->left = c->right;
-    //再将P降为C的右孩子
-    c->right = p;
-
-    //更新P和C的树高
-    p->height = max(get_height(p->left), get_height(p->right)) + 1;
-    c->height = max(get_height(c->left), p->height) + 1;
-    //最后返回C作为新的子树根节点
-    return c;
+    root = nullptr;
 }
 
-//RR平衡旋转 (向左单旋转) ，是向右旋转的镜像
-//假定根节点为P，右孩子为C, 因为右孩子C的右子树CR插入节点导致了不平衡
+//向左旋转
 template <class K, class V>
-Node<K, V>* AVLTree<K, V>::RR_rotate(Node<K, V>* p)
+Node<K, V>* AVLTree<K, V>::rotate_left(Node<K, V>* p)
 {
+    //根节点为P，右孩子为C
     Node<K, V>* c = p->right;
     //先将C的左子树CL更换为P的右子树
     p->right = c->left;
@@ -39,20 +27,55 @@ Node<K, V>* AVLTree<K, V>::RR_rotate(Node<K, V>* p)
     return c;
 }
 
-//RL平衡旋转 (先向右后向左双旋转)
+//向右旋转
 template <class K, class V>
-Node<K, V>* AVLTree<K, V>::RL_rotate(Node<K, V>* p)
+Node<K, V>* AVLTree<K, V>::rotate_right(Node<K, V>* p)
 {
-    p->right = LL_rotate(p->right);
-    return RR_rotate(p);
+    //根节点为P，左孩子为C
+    Node<K, V>* c = p->left;
+    //先将C的右子树CR更换为P的左子树
+    p->left = c->right;
+    //再将P降为C的右孩子
+    c->right = p;
+
+    //更新P和C的树高
+    p->height = max(get_height(p->left), get_height(p->right)) + 1;
+    c->height = max(get_height(c->left), p->height) + 1;
+    //最后返回C作为新的子树根节点
+    return c;
 }
 
-//LR平衡旋转 (先向左后向右双旋转)
+//LL型 (向右单旋转)：因为左孩子C的左子树CL插入节点导致了不平衡
+template <class K, class V>
+Node<K, V>* AVLTree<K, V>::LL_rotate(Node<K, V>* p)
+{
+    return rotate_right(p);
+}
+
+//RR型 (向左单旋转) 因为右孩子C的右子树CR插入节点导致了不平衡
+template <class K, class V>
+Node<K, V>* AVLTree<K, V>::RR_rotate(Node<K, V>* p)
+{
+    return rotate_left(p);
+}
+
+//LR旋转 (先向左后向右双旋转)
 template <class K, class V>
 Node<K, V>* AVLTree<K, V>::LR_rotate(Node<K, V>* p)
 {
-    p->left = RR_rotate(p->left);
-    return LL_rotate(p);
+    p->left = rotate_left(p->left);
+    return rotate_right(p);
+}
+
+//RL型(先向右后向左双旋转)
+template <class K, class V>
+Node<K, V>* AVLTree<K, V>::RL_rotate(Node<K, V>* p)
+{
+    p->right = rotate_right(p->right);
+    return rotate_left(p);
+    // 也可以先左旋转换成LR型，再调用LR型旋转
+    // p = rotate_left(p);
+    // return LR_rotate(p);
 }
 
 //获取节点的高度
@@ -81,9 +104,7 @@ Node<K, V>* AVLTree<K, V>::balance(Node<K, V>* p)
 
     //1. 如果左子树树高更高
     if (p_factor > 1) {
-        //获取左子树的平衡因子
         int c_factor = get_balance_factor(p->left);
-
         if (c_factor > 0) {
             //1.1 左子树(L)的左孩子(L)更高
             p = LL_rotate(p);
@@ -95,9 +116,7 @@ Node<K, V>* AVLTree<K, V>::balance(Node<K, V>* p)
 
     //2. 如果右子树树高更高
     if (p_factor < -1) {
-        //获取左子树的平衡因子
         int c_factor = get_balance_factor(p->right);
-
         if (c_factor > 0) {
             //2.1 右子树(R)的左孩子(L)更高
             p = RL_rotate(p);
@@ -258,6 +277,9 @@ Node<K, V>* AVLTree<K, V>::remove(Node<K, V>* p, K key)
     }
     //注意： 最后要对节点进行平衡操作
     p = balance(p);
+
+    //更新height
+    p->height = max(get_height(p->left), get_height(p->right)) + 1;
     return p;
 }
 

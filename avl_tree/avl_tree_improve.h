@@ -28,10 +28,7 @@ public:
 template <class K, class V>
 class AVLTree {
 public:
-    AVLTree()
-    {
-        root = nullptr;
-    }
+    AVLTree();
 
     //基本接口
     void insert(K key, V value);
@@ -45,16 +42,19 @@ public:
 private:
     Node<K, V>* root;
 
-    //LL平衡旋转 (向右单旋转)：在左孩子(L)的左子树(L)插入导致的不平衡
+    Node<K, V>* rotate_left(Node<K, V>* p);
+    Node<K, V>* rotate_right(Node<K, V>* p);
+
+    //LL型(向右单旋转)：在左孩子(L)的左子树(L)插入导致的不平衡
     Node<K, V>* LL_rotate(Node<K, V>* p);
 
-    //RR平衡旋转 (向左单旋转)：在右孩子(R)的右子树(R)插入导致的不平衡
+    //RR型 (向左单旋转)：在右孩子(R)的右子树(R)插入导致的不平衡
     Node<K, V>* RR_rotate(Node<K, V>* p);
 
-    //RL平衡旋转 (先向右后向左双旋转)：在右孩子(R)的左子树(L)插入导致的不平衡
+    //RL型 (先向右后向左双旋转)：在右孩子(R)的左子树(L)插入导致的不平衡
     Node<K, V>* RL_rotate(Node<K, V>* p);
 
-    //LR平衡旋转 (先向左后向右双旋转)：在左孩子(L)的右子树(R)插入导致的不平衡
+    //LR型 (先向左后向右双旋转)：在左孩子(L)的右子树(R)插入导致的不平衡
     Node<K, V>* LR_rotate(Node<K, V>* p);
 
     //获取高度
