@@ -13,8 +13,8 @@ class Node {
 public:
     K key;
     V value;
-    Node* left;
-    Node* right;
+    Node<K, V>* left;
+    Node<K, V>* right;
     COLOR color;
     Node(K key_, V value_, COLOR color_)
     {
@@ -35,8 +35,8 @@ public:
     }
 
     //基本接口
-    Node<K, V>* find(K key);
     void insert(K key, V value);
+    Node<K, V>* find(K key);
     void remove(K key);
 
     //测试接口
@@ -56,6 +56,8 @@ private:
 
     //插入
     Node<K, V>* insert(Node<K, V>* p, K key, V value);
+    //查找
+    Node<K, V>* find(Node<K, V>* p, K key);
     //删除
     Node<K, V>* remove(Node<K, V>* p, K key, bool& balance_indicator);
     //寻找子树最小节点

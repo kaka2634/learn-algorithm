@@ -28,6 +28,7 @@ void BRTree<K, V>::insert(K key, V value)
 
     root = insert(root, key, value);
     //插入情景1：红黑树为空树，需插入黑色节点
+    //同时在平衡后也， 保证根节点为黑色
     root->color = BLACK;
 }
 
@@ -130,6 +131,29 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* pp, Node<K, V>* p, Node<K, 
 
     //插入情景3：如果插入的父节点为黑色，那么则不需要做任何调整
     return pp;
+}
+
+//查找
+template <class K, class V>
+Node<K, V>* BRTree<K, V>::find(K key)
+{
+    return find(root, key);
+}
+
+template <class K, class V>
+Node<K, V>* BRTree<K, V>::find(Node<K, V>* p, K key)
+{
+    //终结条件: 到达null节点，或者找到对应节点
+    if (p == nullptr || p->key == key) {
+        return p;
+    }
+
+    //继续寻找
+    if (key < p->key) {
+        return find(p->left, key);
+    } else {
+        return find(p->right, key);
+    }
 }
 
 //删除
