@@ -27,8 +27,7 @@ void BRTree<K, V>::insert(K key, V value)
 {
 
     root = insert(root, key, value);
-    //插入情景1：红黑树为空树，需插入黑色节点
-    //同时在平衡后也， 保证根节点为黑色
+    //注意：保证根节点为黑色
     root->color = BLACK;
 }
 
@@ -41,7 +40,7 @@ Node<K, V>* BRTree<K, V>::insert(Node<K, V>* p, K key, V value)
         return p;
     }
 
-    //终止条件2&插入情景2: key已经存在并且找到，则直接更新value, 相当于更新操作
+    //终止条件2: key已经存在并且找到，则直接更新value, 相当于更新操作
     if (p->key == key) {
         p->value = value;
         return p;
@@ -75,61 +74,48 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* pp, Node<K, V>* p, Node<K, 
         c = p->right;
     }
 
-    //插入情景4：插入结点的父结点为红节点, 同时存在也为红色节点的儿子
+    //平衡条件：插入结点的父结点为红节点, 同时存在也为红色节点的儿子
     if (p->color == RED && c != nullptr) {
 
-        //如果父节点是祖父节点的左孩子
-        if (p == pp->left) {
-            //插入情景4.1：叔叔结点存在并且为红结点
-            if (u != nullptr && u->color == RED) {
-                u->color = BLACK;
-                p->color = BLACK;
-                pp->color = RED;
-                return pp;
-            }
+        //情景1：叔叔结点存在并且为红结点
+        if (u != nullptr && u->color == RED) {
+            //变色完再将pp作为插入节点返回
+            u->color = BLACK;
+            p->color = BLACK;
+            pp->color = RED;
+            return pp;
+        }
 
-            //插入情景4.2: 叔叔节点不存在或者为黑色节点，父节点是祖父节点的左孩子 （L)
-            //插入情景4.2.2: 插入结点是其父节点的右儿子 （L-R型）
+        //情景2: 叔叔节点不存在或者为黑色节点
+        if (p == pp->left) {
+            //情景2.2: 父节点是祖父节点的左孩子， 插入结点是其父节点的右儿子 （L-R型）
             if (c == p->right) {
-                //先进行左旋，使之成为4.2.1场景
+                //先以p进行左旋，使之成为2.1场景
                 p = rotate_left(p);
                 pp->left = p;
             }
 
-            //插入情景4.2.1: 插入结点是其父节点的左儿子 （L-L型）
+            //情景2.1: 父节点是祖父节点的左孩子，插入结点是其父节点的左儿子 （L-L型）
             pp = rotate_right(pp);
             //变色
             pp->color = BLACK;
             pp->right->color = RED;
 
         } else {
-            //如果父节点是祖父节点的右孩子
-
-            //插入情景4.1：叔叔结点存在并且为红结点
-            if (u != nullptr && u->color == RED) {
-                u->color = BLACK;
-                p->color = BLACK;
-                pp->color = RED;
-                return pp;
-            }
-
-            //插入情景4.3: 叔叔节点不存在或者为黑色节点，且父节点是祖父节点的右孩子 （R）
-            //插入情景4.3.2: 插入结点是其父节点的左儿子 （R-L型）
+            //情景2.4: 如果父节点是祖父节点的右孩子, 插入结点是其父节点的左儿子 （R-L型）
             if (c == p->left) {
-                //先进行左旋，使之成为4.2.1场景
+                //先进行右旋，使之成为2.3场景
                 p = rotate_right(p);
                 pp->right = p;
             }
 
-            //插入情景4.3.1: 插入结点是其父节点的右儿子 （R-R型）
+            //情景2.3: 如果父节点是祖父节点的右孩子, 插入结点是其父节点的右儿子 （R-R型）
             pp = rotate_left(pp);
             //变色
             pp->color = BLACK;
             pp->left->color = RED;
         }
     }
-
-    //插入情景3：如果插入的父节点为黑色，那么则不需要做任何调整
     return pp;
 }
 
