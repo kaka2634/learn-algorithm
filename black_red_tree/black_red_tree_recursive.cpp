@@ -97,7 +97,7 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* pp, Node<K, V>* p, Node<K, 
 
             //情景2.1: 父节点是祖父节点的左孩子，插入结点是其父节点的左儿子 （L-L型）
             pp = rotate_right(pp);
-            //变色
+            //新的祖父节点（实际是父节点）设为黑色，老祖父节点设为红色
             pp->color = BLACK;
             pp->right->color = RED;
 
@@ -111,7 +111,7 @@ Node<K, V>* BRTree<K, V>::insert_balance(Node<K, V>* pp, Node<K, V>* p, Node<K, 
 
             //情景2.3: 如果父节点是祖父节点的右孩子, 插入结点是其父节点的右儿子 （R-R型）
             pp = rotate_left(pp);
-            //变色
+            //新的祖父节点（实际是父节点）设为黑色，老祖父节点设为红色
             pp->color = BLACK;
             pp->left->color = RED;
         }
@@ -162,8 +162,8 @@ Node<K, V>* BRTree<K, V>::remove(Node<K, V>* p, K key, bool& balance_indicator)
     if (p->key == key) {
         //1. 如果没有左右孩子，直接删除该节点
         if (p->left == nullptr && p->right == nullptr) {
-
-            //删除情景2：替换结点是黑结点, 才需要平衡，通过balance_indicator告诉parent节点
+            
+            //如果替换结点是黑结点, 才需要平衡，通过balance_indicator告诉parent节点
             if (p->color == BLACK) {
                 balance_indicator = true;
             }
@@ -173,17 +173,16 @@ Node<K, V>* BRTree<K, V>::remove(Node<K, V>* p, K key, bool& balance_indicator)
         }
 
         Node<K, V>* replace = nullptr;
-        //2. 如果只有一个孩子，那么直接将孩子节点作为替换节点
+        //2. 如果只有一个孩子，就直接将孩子节点作为替换节点
         if (p->left == nullptr) {
             replace = p->right;
         } else if (p->right == nullptr) {
             replace = p->left;
         } else {
-            //3. 剩下就是左右孩子都存在的情况，这里可以寻找后继节点作为替换节点（也可以使用前驱节点）
+            //3. 如果左右孩子都存在，寻找后继节点（也可以使用前驱节点）作为替换节点
             replace = find_min(p->right);
         }
 
-        //注意：与二叉搜索树的不同， 对于红黑树，需要将情况2的节点替换而不是直接删除，需要等到到叶子节点才能删除
         p->key = replace->key;
         p->value = replace->value;
         //注意：这里使用的树节点删除技巧，删除节点需要找到一个替代节点，将替代节点放到删除节点位置从而不会破坏树的性质。
@@ -202,7 +201,6 @@ Node<K, V>* BRTree<K, V>::remove(Node<K, V>* p, K key, bool& balance_indicator)
 
     }
     //注意： 这里需要用else if，因为key的值可能会在前面替换节点时被修改了
-    //同时，递归删除树同样需要将返回值用于更新左右子树指针
     else if (key < p->key) {
         p->left = remove(p->left, key, balance_indicator);
         if (balance_indicator) {
