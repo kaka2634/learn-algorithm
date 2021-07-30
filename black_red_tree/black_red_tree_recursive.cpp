@@ -223,38 +223,38 @@ template <class K, class V>
 Node<K, V>* BRTree<K, V>::remove_balance(Node<K, V>* p, Node<K, V>* s, bool& balance_indicator)
 {
 
-    //删除情景2.1：替换结点是其父结点的左子结点
+    //情景1：删除节点是父结点的左孩子
     if (p->right == s) {
-        //删除情景2.1.1：替换结点的兄弟结点是红结点
+        //情景1.4：删除节点的兄弟节点是红色
         if (s->color == RED) {
             s->color = BLACK;
             p->color = RED;
-            //变成删除情景2.1.2.3
+            //变成删除情景1.3
             p = rotate_left(p);
             s = p->right;
         }
-        //删除情景2.1.2：替换结点的兄弟结点是黑结点
+        //情景1.1 - 1.3：删除节点的兄弟节点是黑色
         if (s->color == BLACK) {
-            //删除情景2.1.2.3：替换结点的兄弟结点的子结点都为黑结点(NIL也是黑色节点)
+            //情景1.3：兄弟节点的孩子均为黑色(包括NIL节点)
             if ((s->left == nullptr || s->left->color == BLACK)
                 && (s->right == nullptr || s->right->color == BLACK)) {
                 s->color = RED;
                 //p 视为新的替换节点, 不改变indicator，返回后继续删除平衡操作
                 return p;
             } else {
-                //删除情景2.1.2.2：替换结点的兄弟结点的右子结点为黑结点，左子结点为红结点
+                //情景1.2：兄弟节点的右孩子为黑色，左孩子为红色
                 if ((s->right == nullptr || s->right->color == BLACK)) {
                     s->color = RED;
                     if (s->left != nullptr) {
                         s->left->color = BLACK;
                     }
-                    //转换为删除情景2.1.2.1
+                    //转换为删除情景1.1
                     s = rotate_right(s); //rotate之后更新新的兄弟节点
                     //注意：这里要将新的s链接上p
                     p->right = s;
                 }
 
-                //删除情景2.1.2.1：替换结点的兄弟结点的右子结点是红结点，左子结点任意颜色
+                //情景1.1：兄弟结点的右孩子是红色，左孩子颜色任意
                 s->color = p->color;
                 p->color = BLACK;
                 if (s->right != nullptr) {
@@ -266,37 +266,37 @@ Node<K, V>* BRTree<K, V>::remove_balance(Node<K, V>* p, Node<K, V>* s, bool& bal
                 return p;
             }
         }
-    } else {
-        //删除情景2.2.1：替换结点的兄弟结点是红结点
+    } else { //情景2： 删除节点是父节点的右孩子
+        //情景2.4：删除节点的兄弟节点是红色
         if (s->color == RED) {
             s->color = BLACK;
             p->color = RED;
-            //变成删除情景2.2.2.3
+            //变成删除情景2.3
             p = rotate_right(p);
             s = p->left;
         }
-        //删除情景2.2.2：替换结点的兄弟结点是黑结点
+        //情景2.1 - 2.3：删除节点的兄弟节点是黑色
         if (s->color == BLACK) {
-            //删除情景2.2.2.3：替换结点的兄弟结点的子结点都为黑结点(NIL也是黑色节点)
+            //情景2.3：兄弟节点的孩子均为黑色(包括NIL节点)
             if ((s->left == nullptr || s->left->color == BLACK)
                 && (s->right == nullptr || s->right->color == BLACK)) {
                 s->color = RED;
                 //p 视为新的替换节点, 不改变indicator，返回后继续删除平衡操作
                 return p;
             } else {
-                //删除情景2.2.2.2：替换结点的兄弟结点的左子结点为黑结点，右子结点为红结点
+                //情景2.2：兄弟节点的左孩子为黑色，右孩子为红色
                 if ((s->left == nullptr || s->left->color == BLACK)) {
                     s->color = RED;
                     if (s->right != nullptr) {
                         s->right->color = BLACK;
                     }
-                    //转换为删除情景2.2.2.1
+                    //转换为情景2.1
                     s = rotate_left(s); //rotate之后更新新的兄弟节点
                     //注意：这里要将新的s链接上p
                     p->left = s;
                 }
 
-                //删除情景2.2.2.1：替换结点的兄弟结点的左子结点是红结点，右子结点任意颜色
+                //情景2.1：兄弟结点的左孩子是红色，右孩子颜色任意
                 s->color = p->color;
                 p->color = BLACK;
                 if (s->left != nullptr) {
