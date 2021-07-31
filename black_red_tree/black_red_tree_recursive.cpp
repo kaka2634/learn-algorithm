@@ -162,7 +162,7 @@ Node<K, V>* BRTree<K, V>::remove(Node<K, V>* p, K key, bool& balance_indicator)
     if (p->key == key) {
         //1. 如果没有左右孩子，直接删除该节点
         if (p->left == nullptr && p->right == nullptr) {
-            
+
             //如果替换结点是黑结点, 才需要平衡，通过balance_indicator告诉parent节点
             if (p->color == BLACK) {
                 balance_indicator = true;
@@ -229,8 +229,11 @@ Node<K, V>* BRTree<K, V>::remove_balance(Node<K, V>* p, Node<K, V>* s, bool& bal
         if (s->color == RED) {
             s->color = BLACK;
             p->color = RED;
-            //变成删除情景1.3
             p = rotate_left(p);
+            //先调用balance方法处理左子树（情景1.1-1.3）
+            if (p->left->right != nullptr) {
+                p->left = remove_balance(p->left, p->left->right, balance_indicator);
+            }
             s = p->right;
         }
         //情景1.1 - 1.3：删除节点的兄弟节点是黑色
@@ -271,8 +274,11 @@ Node<K, V>* BRTree<K, V>::remove_balance(Node<K, V>* p, Node<K, V>* s, bool& bal
         if (s->color == RED) {
             s->color = BLACK;
             p->color = RED;
-            //变成删除情景2.3
             p = rotate_right(p);
+            //先调用balance方法处理左子树（情景2.1-2.3）
+            if (p->right->left != nullptr) {
+                p->right = remove_balance(p->right, p->right->left, balance_indicator);
+            }
             s = p->left;
         }
         //情景2.1 - 2.3：删除节点的兄弟节点是黑色
@@ -329,7 +335,8 @@ void BRTree<K, V>::pre_order_traverse(Node<K, V>* p)
 {
     if (p == nullptr)
         return;
-    std::cout << "Key: " << p->key << "Color: " << p->color << std::endl;
+    std::cout << p->key << "(" << (p->color == RED ? 'R' : 'B')
+              << ") ";
     pre_order_traverse(p->left);
     pre_order_traverse(p->right);
 }
@@ -341,7 +348,8 @@ void BRTree<K, V>::mid_order_traverse(Node<K, V>* p)
     if (p == nullptr)
         return;
     mid_order_traverse(p->left);
-    std::cout << "Key: " << p->key << "Color: " << p->color << std::endl;
+    std::cout << p->key << "(" << (p->color == RED ? 'R' : 'B')
+              << ") ";
     mid_order_traverse(p->right);
 }
 
@@ -350,8 +358,10 @@ void BRTree<K, V>::print()
 {
     std::cout << "pre order: " << std::endl;
     pre_order_traverse(root);
+    std::cout << std::endl;
     std::cout << "mid order: " << std::endl;
     mid_order_traverse(root);
+    std::cout << std::endl;
 }
 
 template <class K, class V>
@@ -393,15 +403,18 @@ int main()
     for (int i = 0; i < 9; i++) {
         tree.insert(arr[i], i);
     }
-    std::cout << "After inserted, tree is" << std::endl;
+    std::cout << "*************************" << std::endl;
+    std::cout << "After inserted, tree is: " << std::endl;
     tree.print();
 
+    std::cout << "*************************" << std::endl;
     int arr2[] = { 80, 10, 50, 40 };
     for (int i = 0; i < 4; i++) {
         tree.remove(arr2[i]);
         std::cout << "remove value: " << arr2[i] << " tree balance check : " << tree.is_balance() << std::endl;
     }
-    std::cout << "After removed, tree is" << std::endl;
+    std::cout << "*************************" << std::endl;
+    std::cout << "After removed, tree is: " << std::endl;
     tree.print();
     return 0;
 }
