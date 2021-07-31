@@ -1,6 +1,7 @@
 ## 红黑树 Black-Red-Tree
 
-文章总结(In progress)：
+个人博客总结：
+- [红黑树 - 标准模板库中的二叉搜索树](https://kaka2634.github.io/study/black_red_tree_summary.html)
 
 迭代实现：
 - [black_red_tree.h](black_red_tree.h)

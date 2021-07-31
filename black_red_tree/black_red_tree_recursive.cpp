@@ -315,6 +315,7 @@ Node<K, V>* BRTree<K, V>::remove_balance(Node<K, V>* p, Node<K, V>* s, bool& bal
             }
         }
     }
+    return p;
 }
 
 //返回节点p的最左子树节点，用于找到后继节点
